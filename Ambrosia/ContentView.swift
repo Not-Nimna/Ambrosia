@@ -6,56 +6,42 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
+        // Bottom nav bar: Home (left), Search (center), Profile (right).
+        TabView {
+            Tab("Home", systemImage: "house") {
+                homeView
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
+
+            Tab("Search", systemImage: "magnifyingglass") {
+                Text("Search")
             }
-        } detail: {
-            Text("Select an item")
+
+            Tab("Profile", systemImage: "person") {
+                Text("Profile")
+            }
         }
     }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
+    // Placeholder content; replace with data from the fragrance dataset.
+    private var homeView: some View {
+        FragranceDetailView(
+            name: "Fragrance Name",
+            imageName: nil,
+            description: "A description of the fragrance goes here. Describe its character, mood, and when it is best worn.",
+            notes: [
+                FragranceNote(name: "Citrus", intensity: 80),
+                FragranceNote(name: "Floral", intensity: 60),
+                FragranceNote(name: "Woody", intensity: 70),
+                FragranceNote(name: "Musk", intensity: 40),
+                FragranceNote(name: "Amber", intensity: 55)
+            ]
+        )
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
